@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NEUPay — Cashier Reload Window</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .cashier-grid { display: grid; grid-template-columns: 420px 1fr; gap: 22px; }
+        .quick-amts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0; }
+        .amt-btn { padding: 12px; border: 1px solid var(--border); background: var(--bg); border-radius: 10px; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.15s; }
+        .amt-btn:hover { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
+        .tx-table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 12px; }
+        .tx-table th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); padding: 10px 8px; border-bottom: 1px solid var(--border); }
+        .tx-table td { padding: 14px 8px; border-bottom: 1px solid var(--border); }
+        .alert { padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 700; margin-top: 12px; display: none; }
+    </style>
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div>
+            <a href="index.html" class="sidebar-brand">
+                <div class="brand-icon">N</div>
+                <div>
+                    <div style="font-weight: 800; font-size: 16px;">NEUPay</div>
+                    <div style="font-size: 11px; color: #94a3b8;">Treasury & Reloads</div>
+                </div>
+            </a>
+
+            <div class="nav-section-label">Campus Portals</div>
+            <a href="index.html" class="side-link">Student Dashboard</a>
+            <a href="cashier.html" class="side-link active">Cashier Window</a>
+            <a href="admin.html" class="side-link">MIS Admin Center</a>
+
+            <div class="nav-section-label">Merchant Terminals</div>
+            <a href="pos-canteen.html" class="side-link">Canteen POS Terminal</a>
+            <a href="pos-bookstore.html" class="side-link">Bookstore POS Terminal</a>
+        </div>
+
+        <div class="terminal-status">
+            <div><span class="pulse-dot"></span><strong>CSH-WINDOW-02</strong></div>
+            <div style="color: #94a3b8; font-size: 11px; margin-top: 4px;">Teller Drawer Open</div>
+        </div>
+    </aside>
+
+    <main class="main-area">
+        <div class="page-header">
+            <div>
+                <h1>Cashier Over-the-Counter Desk</h1>
+                <p>Accept physical cash and load stored-value credit onto student RFID cards</p>
+            </div>
+            <span class="badge badge-success">● Window 02 Active</span>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Verified Cardholder</div>
+                <div class="kpi-value" style="font-size: 20px;">John Doe</div>
+                <div class="mono" style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">ID: 2026-10492 • CARD_88A12B</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Student Current Balance</div>
+                <div class="kpi-value" style="color: var(--primary);" id="cashierStudentBal">₱1,450.00</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Live RFID chip value</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Window Cash Collected (Shift)</div>
+                <div class="kpi-value" id="cashierDrawerTotal">₱1,000.00</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Total cash reloads issued</div>
+            </div>
+        </div>
+
+        <div class="cashier-grid">
+            <div class="card">
+                <span class="badge badge-success" style="margin-bottom: 8px;">CASH DEPOSIT TERMINAL</span>
+                <h3 style="font-size: 17px;">Load RFID Wallet</h3>
+                <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 14px;">Tap student card on window reader and enter physical cash received.</p>
+
+                <label style="font-size: 12px; font-weight: 700;">Scanned Card UID</label>
+                <input type="text" class="mono" value="CARD_88A12B" readonly style="background: var(--bg);">
+
+                <div class="quick-amts">
+                    <button class="amt-btn" onclick="setAmt(100)">+₱100</button>
+                    <button class="amt-btn" onclick="setAmt(200)">+₱200</button>
+                    <button class="amt-btn" onclick="setAmt(500)">+₱500</button>
+                    <button class="amt-btn" onclick="setAmt(1000)">+₱1,000</button>
+                    <button class="amt-btn" onclick="setAmt(1500)">+₱1,500</button>
+                    <button class="amt-btn" onclick="setAmt(2000)">+₱2,000</button>
+                </div>
+
+                <label style="font-size: 12px; font-weight: 700;">Cash Tendered (PHP)</label>
+                <input type="number" id="topupAmount" placeholder="0.00">
+
+                <button class="btn btn-primary" style="margin-top: 14px;" onclick="processTopUp()">Confirm Cash Reload</button>
+                <div id="cashierAlert" class="alert"></div>
+            </div>
+
+            <div class="card">
+                <h3 style="font-size: 16px;">Recent Window Reload Receipts</h3>
+                <p style="font-size: 12px; color: var(--text-muted);">Cash top-ups processed at Cashier Windows</p>
+
+                <table class="tx-table">
+                    <thead>
+                        <tr>
+                            <th>Window / Station</th>
+                            <th>Card UID</th>
+                            <th>Timestamp</th>
+                            <th style="text-align: right;">Cash Loaded</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cashierTxTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="store.js"></script>
+<script>
+    function setAmt(val) { document.getElementById('topupAmount').value = val; }
+
+    function renderCashier() {
+        const db = getDB();
+        document.getElementById('cashierStudentBal').innerText = formatPHP(db.student.balance);
+
+        const reloads = db.transactions.filter(tx => tx.amount > 0);
+        const shiftTotal = reloads.reduce((sum, tx) => sum + tx.amount, 0);
+        document.getElementById('cashierDrawerTotal').innerText = formatPHP(shiftTotal);
+
+        document.getElementById('cashierTxTable').innerHTML = reloads.map(tx => `
+            <tr>
+                <td>
+                    <strong>${tx.merchant}</strong>
+                    <div class="mono" style="font-size: 11px; color: var(--text-muted);">${tx.terminal}</div>
+                </td>
+                <td class="mono" style="font-size: 12px;">${db.student.cardUid}</td>
+                <td style="color: var(--text-muted); font-size: 12.5px;">${tx.time}</td>
+                <td style="text-align: right; font-weight: 800; color: var(--primary);">+${formatPHP(tx.amount)}</td>
+            </tr>
+        `).join('');
+    }
+
+    function processTopUp() {
+        const amt = parseFloat(document.getElementById('topupAmount').value);
+        const alertBox = document.getElementById('cashierAlert');
+        if (!amt || amt <= 0) {
+            alertBox.style.display = 'block';
+            alertBox.style.background = 'var(--danger-soft)';
+            alertBox.style.color = 'var(--danger)';
+            alertBox.innerText = 'Enter a valid cash amount greater than ₱0.';
+            return;
+        }
+
+        const db = getDB();
+        db.student.balance += amt;
+        const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        db.transactions.unshift({
+            merchant: "Cashier Window 2 Top-up",
+            terminal: "CSH-WINDOW-02",
+            amount: amt,
+            time: `Just now (${now})`,
+            type: "Credit"
+        });
+        saveDB(db);
+
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'var(--primary-soft)';
+        alertBox.style.color = 'var(--primary)';
+        alertBox.innerText = `Success! Loaded ${formatPHP(amt)} onto John Doe's RFID card.`;
+        document.getElementById('topupAmount').value = '';
+        renderCashier();
+    }
+
+    renderCashier();
+    window.addEventListener('storage', renderCashier);
+</script>
+</body>
+</html>

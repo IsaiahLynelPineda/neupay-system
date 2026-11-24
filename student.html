@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NEUPay — Student Campus Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dash-grid { display: grid; grid-template-columns: 360px 1fr; gap: 22px; }
+        .tx-table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 12px; }
+        .tx-table th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); padding: 10px 8px; border-bottom: 1px solid var(--border); }
+        .tx-table td { padding: 14px 8px; border-bottom: 1px solid var(--border); }
+        .tx-table tr:last-child td { border-bottom: none; }
+        .security-box { margin-top: 18px; padding: 18px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface); }
+        .security-box.locked-state { border-color: #fecdd3; background: var(--danger-soft); }
+    </style>
+</head>
+<body>
+<div class="app-shell">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+        <div>
+            <a href="index.html" class="sidebar-brand">
+                <div class="brand-icon">N</div>
+                <div>
+                    <div style="font-weight: 800; font-size: 16px;">NEUPay</div>
+                    <div style="font-size: 11px; color: #94a3b8;">Campus Cashless Core</div>
+                </div>
+            </a>
+
+            <div class="nav-section-label">Campus Portals</div>
+            <a href="student.html" class="side-link active">Student Dashboard</a>
+            <a href="admin.html" class="side-link">Cashier & Admin Desk</a>
+
+            <div class="nav-section-label">Merchant Terminals</div>
+            <a href="pos-canteen.html" class="side-link">Canteen POS Terminal</a>
+            <a href="pos-bookstore.html" class="side-link">Bookstore POS Terminal</a>
+        </div>
+
+        <div class="terminal-status">
+            <div><span class="pulse-dot"></span><strong>RFID Mesh Online</strong></div>
+            <div style="color: #94a3b8; font-size: 11px; margin-top: 4px;">Real-time sync active</div>
+        </div>
+    </aside>
+
+    <!-- Main Dashboard -->
+    <main class="main-area">
+        <div class="page-header">
+            <div>
+                <h1>Welcome back, John Doe!</h1>
+                <p>Student ID: <span class="mono">2026-10492</span> • BS Information Technology</p>
+            </div>
+            <span id="studentTopBadge" class="badge badge-success">● Card Active & Operational</span>
+        </div>
+
+        <!-- KPI Summary Row -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Available Campus Balance</div>
+                <div class="kpi-value" style="color: var(--primary);" id="kpiBalance">₱1,450.00</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Synced with on-campus readers</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Recent Activity Count</div>
+                <div class="kpi-value" id="kpiTxCount">3 Logs</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Canteen, Bookstore & Cashier</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Active Campus Outlets</div>
+                <div class="kpi-value">3 Locations</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Canteen, Bookstore & Cashier</div>
+            </div>
+        </div>
+
+        <div class="dash-grid">
+            <!-- Left Column: Virtual RFID Card + Security Kill-Switch -->
+            <div>
+                <div class="rfid-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 11px; font-weight: 700; letter-spacing: 1px; opacity: 0.85;">NEUPAY TAPPASS</div>
+                            <div style="font-size: 11px; opacity: 0.7;">New Era University</div>
+                        </div>
+                        <div class="emv-chip"></div>
+                    </div>
+
+                    <div style="margin: 18px 0;">
+                        <div style="font-size: 11px; opacity: 0.75;">CARDHOLDER</div>
+                        <div style="font-size: 17px; font-weight: 700; letter-spacing: 0.5px;">JOHN DOE</div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                        <div>
+                            <div style="font-size: 10px; opacity: 0.7;">HARDWARE UID</div>
+                            <div class="mono" style="font-size: 13px; font-weight: 700;">CARD_88A12B</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 10px; opacity: 0.7;">BALANCE</div>
+                            <div style="font-size: 18px; font-weight: 800;" id="cardBalance">₱1,450.00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Security Kill-Switch -->
+                <div class="security-box" id="securityContainer">
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                        <div>
+                            <strong style="font-size: 14px;">RFID Card Kill-Switch</strong>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-top: 3px;" id="lockSubtext">
+                                Misplaced your card? Lock it immediately to block cafeteria & bookstore taps.
+                            </p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="studentLockSwitch" onchange="toggleStudentLock()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Live Tap History -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div>
+                        <h3 style="font-size: 16px;">Recent Tap & Reload Activity</h3>
+                        <p style="font-size: 12px; color: var(--text-muted);">Live ledger across all campus terminals</p>
+                    </div>
+                    <span class="badge badge-neutral mono">UID: CARD_88A12B</span>
+                </div>
+
+                <table class="tx-table">
+                    <thead>
+                        <tr>
+                            <th>Station / Merchant</th>
+                            <th>Type</th>
+                            <th>Timestamp</th>
+                            <th style="text-align: right;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTxList"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="store.js"></script>
+<script>
+    function renderStudent() {
+        const db = getDB();
+        const formatted = formatPHP(db.student.balance);
+        document.getElementById('kpiBalance').innerText = formatted;
+        document.getElementById('cardBalance').innerText = formatted;
+        document.getElementById('kpiTxCount').innerText = `${db.transactions.length} Logs`;
+        document.getElementById('studentLockSwitch').checked = db.student.isLocked;
+
+        const badge = document.getElementById('studentTopBadge');
+        const box = document.getElementById('securityContainer');
+        const note = document.getElementById('lockSubtext');
+
+        if (db.student.isLocked) {
+            badge.className = 'badge badge-danger';
+            badge.innerText = '● CARD LOCKED / FROZEN';
+            box.classList.add('locked-state');
+            note.innerText = 'Card is currently FROZEN. All POS tap attempts will be declined.';
+        } else {
+            badge.className = 'badge badge-success';
+            badge.innerText = '● Card Active & Operational';
+            box.classList.remove('locked-state');
+            note.innerText = 'Misplaced your card? Lock it immediately to block cafeteria & bookstore taps.';
+        }
+
+        document.getElementById('studentTxList').innerHTML = db.transactions.map(tx => `
+            <tr>
+                <td>
+                    <strong>${tx.merchant}</strong>
+                    <div class="mono" style="font-size: 11px; color: var(--text-muted);">${tx.terminal}</div>
+                </td>
+                <td><span class="badge ${tx.amount > 0 ? 'badge-success' : 'badge-neutral'}">${tx.type}</span></td>
+                <td style="color: var(--text-muted); font-size: 12.5px;">${tx.time}</td>
+                <td style="text-align: right; font-weight: 800; color: ${tx.amount > 0 ? 'var(--primary)' : 'var(--text)'};">
+                    ${tx.amount > 0 ? '+' : '-'}${formatPHP(tx.amount)}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function toggleStudentLock() {
+        const db = getDB();
+        db.student.isLocked = document.getElementById('studentLockSwitch').checked;
+        saveDB(db);
+        renderStudent();
+    }
+
+    renderStudent();
+    window.addEventListener('storage', renderStudent);
+</script>
+</body>
+</html>

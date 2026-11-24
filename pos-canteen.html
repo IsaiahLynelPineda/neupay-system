@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NEUPay POS — Main Canteen</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .pos-grid { display: grid; grid-template-columns: 1fr 390px; gap: 22px; }
+        .hero-strip { background: linear-gradient(135deg, #9a3412, #ea580c); color: #fff; padding: 22px 26px; border-radius: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-md); }
+        .menu-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        .menu-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; cursor: pointer; transition: all 0.15s ease; display: flex; flex-direction: column; justify-content: space-between; }
+        .menu-tile:hover { border-color: var(--canteen); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .cat-pill { font-size: 10px; font-weight: 800; color: var(--canteen); background: var(--canteen-soft); padding: 3px 8px; border-radius: 6px; align-self: flex-start; }
+        .tray-list { min-height: 150px; max-height: 230px; overflow-y: auto; border-bottom: 1px solid var(--border); margin: 12px 0; }
+        .tray-row { display: flex; justify-content: space-between; padding: 9px 0; font-size: 13.5px; border-bottom: 1px dashed var(--border); }
+        .total-pill { background: var(--canteen-soft); color: #9a3412; padding: 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 20px; font-weight: 800; margin-bottom: 14px; }
+        .tap-box { background: var(--bg); padding: 16px; border-radius: 12px; border: 1.5px dashed #cbd5e1; }
+        .status-toast { padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 700; margin-top: 12px; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div>
+            <a href="index.html" class="sidebar-brand">
+                <div class="brand-icon" style="background: linear-gradient(135deg, #f97316, #c2410c);">N</div>
+                <div>
+                    <div style="font-weight: 800; font-size: 16px;">NEUPay POS</div>
+                    <div style="font-size: 11px; color: #94a3b8;">Food Hub Terminal</div>
+                </div>
+            </a>
+
+            <div class="nav-section-label">Campus Portals</div>
+            <a href="index.html" class="side-link">Student Dashboard</a>
+            <a href="cashier.html" class="side-link">Cashier Window</a>
+            <a href="admin.html" class="side-link">MIS Admin Center</a>
+
+            <div class="nav-section-label">Merchant Terminals</div>
+            <a href="pos-canteen.html" class="side-link active canteen-active">Canteen POS Terminal</a>
+            <a href="pos-bookstore.html" class="side-link">Bookstore POS Terminal</a>
+        </div>
+
+        <div class="terminal-status">
+            <div><span class="pulse-dot" style="background:#f97316;"></span><strong>POS-CANTEEN-04</strong></div>
+            <div style="color: #94a3b8; font-size: 11px; margin-top: 4px;">NFC Reader Ready</div>
+        </div>
+    </aside>
+
+    <main class="main-area">
+        <div class="hero-strip">
+            <div>
+                <div style="font-size: 11px; font-weight: 700; letter-spacing: 1px; opacity: 0.85;">UNIVERSITY MAIN CAFETERIA</div>
+                <h1 style="font-size: 24px; margin-top: 2px;">Main Canteen — Stall 04</h1>
+            </div>
+            <span class="mono" style="background: rgba(255,255,255,0.18); padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;">TERMINAL #04</span>
+        </div>
+
+        <div class="pos-grid">
+            <div class="menu-cards">
+                <div class="menu-tile" onclick="addFood('Beef Tapsilog Meal', 65)">
+                    <span class="cat-pill">RICE MEAL</span>
+                    <div style="margin: 12px 0;">
+                        <strong style="font-size: 16px;">Beef Tapsilog Meal</strong>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">Garlic rice, fried egg & cured beef</p>
+                    </div>
+                    <strong style="color: var(--canteen); font-size: 18px;">₱65.00</strong>
+                </div>
+
+                <div class="menu-tile" onclick="addFood('Chicken Teriyaki Bento', 85)">
+                    <span class="cat-pill">SIGNATURE SET</span>
+                    <div style="margin: 12px 0;">
+                        <strong style="font-size: 16px;">Chicken Teriyaki Bento</strong>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">Glazed chicken fillet + steamed rice</p>
+                    </div>
+                    <strong style="color: var(--canteen); font-size: 18px;">₱85.00</strong>
+                </div>
+
+                <div class="menu-tile" onclick="addFood('Iced Gulaman (16oz)', 20)">
+                    <span class="cat-pill">BEVERAGE</span>
+                    <div style="margin: 12px 0;">
+                        <strong style="font-size: 16px;">Iced Gulaman (16oz)</strong>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">Chilled brown sugar refreshment</p>
+                    </div>
+                    <strong style="color: var(--canteen); font-size: 18px;">₱20.00</strong>
+                </div>
+
+                <div class="menu-tile" onclick="addFood('Caramelized Turon (2pcs)', 15)">
+                    <span class="cat-pill">MERIENDA</span>
+                    <div style="margin: 12px 0;">
+                        <strong style="font-size: 16px;">Caramelized Turon (2pcs)</strong>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">Crispy banana spring rolls</p>
+                    </div>
+                    <strong style="color: var(--canteen); font-size: 18px;">₱15.00</strong>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="font-size: 16px;">Order Tray</h3>
+                    <button onclick="clearTray()" style="background:none; border:none; color:var(--danger); font-size:12px; font-weight:700; cursor:pointer;">Clear All</button>
+                </div>
+                <div class="tray-list" id="trayList">
+                    <p style="color:var(--text-muted); font-size:13px; text-align:center; margin-top:50px;">Click menu tiles to build order</p>
+                </div>
+                <div class="total-pill">
+                    <span style="font-size: 13px;">TOTAL DUE</span>
+                    <span id="trayTotal">₱0.00</span>
+                </div>
+
+                <div class="tap-box">
+                    <label style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; color: var(--text-muted);">Contactless RFID Tap Input</label>
+                    <input type="text" class="mono" id="canteenUid" value="CARD_88A12B">
+                    <button class="btn btn-canteen" style="margin-top: 10px;" onclick="payCanteen()">Tap Card & Charge</button>
+                </div>
+                <div id="canteenStatus" class="status-toast" style="background: var(--bg); color: var(--text-muted);">Awaiting student RFID tap</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="store.js"></script>
+<script>
+    let tray = [];
+    function addFood(name, price) { tray.push({ name, price }); renderTray(); }
+    function clearTray() { tray = []; renderTray(); }
+    function renderTray() {
+        const total = tray.reduce((sum, i) => sum + i.price, 0);
+        document.getElementById('trayTotal').innerText = formatPHP(total);
+        const list = document.getElementById('trayList');
+        if (!tray.length) {
+            list.innerHTML = `<p style="color:var(--text-muted); font-size:13px; text-align:center; margin-top:50px;">Click menu tiles to build order</p>`;
+            return;
+        }
+        list.innerHTML = tray.map(i => `<div class="tray-row"><span>${i.name}</span><strong>${formatPHP(i.price)}</strong></div>`).join('');
+    }
+    function payCanteen() {
+        const total = tray.reduce((sum, i) => sum + i.price, 0);
+        const status = document.getElementById('canteenStatus');
+        const db = getDB();
+
+        if (total === 0) {
+            status.style.background = 'var(--danger-soft)'; status.style.color = 'var(--danger)';
+            status.innerText = 'Select at least one meal item first.';
+            return;
+        }
+        if (db.student.isLocked) {
+            status.style.background = 'var(--danger-soft)'; status.style.color = 'var(--danger)';
+            status.innerText = 'DECLINED: Card [CARD_88A12B] is FROZEN by owner!';
+            return;
+        }
+        if (db.student.balance < total) {
+            status.style.background = 'var(--danger-soft)'; status.style.color = 'var(--danger)';
+            status.innerText = `DECLINED: Insufficient balance (${formatPHP(db.student.balance)})`;
+            return;
+        }
+
+        db.student.balance -= total;
+        const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        db.transactions.unshift({
+            merchant: "Main Canteen Stall 04",
+            terminal: "POS-CANTEEN-04",
+            amount: -total,
+            time: `Just now (${now})`,
+            type: "Debit"
+        });
+        saveDB(db);
+
+        status.style.background = 'var(--primary-soft)'; status.style.color = 'var(--primary)';
+        status.innerText = `APPROVED! Deducted ${formatPHP(total)} • New Bal: ${formatPHP(db.student.balance)}`;
+        clearTray();
+    }
+</script>
+</body>
+</html>

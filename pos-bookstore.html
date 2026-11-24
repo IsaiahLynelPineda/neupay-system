@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NEUPay POS — University Bookstore</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .pos-grid { display: grid; grid-template-columns: 1fr 390px; gap: 22px; }
+        .hero-strip { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: #fff; padding: 22px 26px; border-radius: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-md); }
+        .sku-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        .sku-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; cursor: pointer; transition: all 0.15s ease; display: flex; flex-direction: column; justify-content: space-between; }
+        .sku-tile:hover { border-color: var(--bookstore); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .cat-pill { font-size: 10px; font-weight: 800; color: var(--bookstore); background: var(--bookstore-soft); padding: 3px 8px; border-radius: 6px; align-self: flex-start; }
+        .tray-list { min-height: 150px; max-height: 230px; overflow-y: auto; border-bottom: 1px solid var(--border); margin: 12px 0; }
+        .tray-row { display: flex; justify-content: space-between; padding: 9px 0; font-size: 13.5px; border-bottom: 1px dashed var(--border); }
+        .total-pill { background: var(--bookstore-soft); color: #1e3a8a; padding: 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 20px; font-weight: 800; margin-bottom: 14px; }
+        .tap-box { background: var(--bg); padding: 16px; border-radius: 12px; border: 1.5px dashed #cbd5e1; }
+        .status-toast { padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 700; margin-top: 12px; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div>
+            <a href="index.html" class="sidebar-brand">
+                <div class="brand-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">N</div>
+                <div>
+                    <div style="font-weight: 800; font-size: 16px;">NEUPay POS</div>
+                    <div style="font-size: 11px; color: #94a3b8;">Academic Retail</div>
+                </div>
+            </a>
+
+            <div class="nav-section-label">Campus Portals</div>
+            <a href="index.html" class="side-link">Student Dashboard</a>
+            <a href="cashier.html" class="side-link">Cashier Window</a>
+            <a href="admin.html" class="side-link">MIS Admin Center</a>
+
+            <div class="nav-section-label">Merchant Terminals</div>
+            <a href="pos-canteen.html" class="side-link">Canteen POS Terminal</a>
+            <a href="pos-bookstore.html" class="side-link active book-active">Bookstore POS Terminal</a>
+        </div>
+
+        <div class="terminal-status">
+            <div><span class="pulse-dot" style="background:#3b82f6;"></span><strong>POS-BKSTR-01</strong></div>
+            <div style="color: #94a3b8; font-size: 11px; margin-top: 4px;">Retail Checkout Online</div>
+        </div>
+    </aside>
+
+    <main class="main-area">
+        <div class="hero-strip">
+            <div>
+                <div style="font-size: 11px; font-weight: 700; letter-spacing: 1px; opacity: 0.85;">CAMPUS BOOKSTORE & PRINT HUB</div>
+                <h1 style="font-size: 24px; margin-top: 2px;">University Book Store</h1>
+            </div>
+            <span class="mono" style="background: rgba(255,255,255,0.18); padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;">TERMINAL #01</span>
+        </div>
+
+        <div class="pos-grid">
+            <div class="sku-cards">
+                <div class="sku-tile" onclick="addSku('Systems Analysis Workbook', 220)">
+                    <span class="cat-pill">TEXTBOOK</span>
+                    <div style="margin: 12px 0;">
+                        <strong style="font-size: 16px;">Systems Analysis Workbook</strong>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">BS InfoTech Official Lab Manual</p>
+                    </div>
+                    <strong style="color: var(--bookstore); font-size: 18px;">₱220.00</strong>
+                </div>
+
+                <div class="sku-tile" onclick="addSku('NEU Official ID Lanyard', 85)">
+                    <span class="cat-pill">MERCHANDISE</span>
+                    <div style="margin: 12px 0;">
+                        <strong style="font-size: 16px;">NEU Official ID Lanyard</strong>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">Woven strap + RFID card protector</p>
+                    </div>
+                    <strong style="color: var(--bookstore); font-size: 18px;">₱85.00</strong>
+                </div>
+
+                <div class="sku-tile" onclick="addSku('Exam Blue Book & Scantron', 25)">
+                    <span class="cat-pill">SUPPLIES</span>
+                    <div style="margin: 12px 0;">
+                        <strong style="font-size: 16px;">Exam Blue Book & Scantron</strong>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">Midterm examination booklet bundle</p>
+                    </div>
+                    <strong style="color: var(--bookstore); font-size: 18px;">₱25.00</strong>
+                </div>
+
+                <div class="sku-tile" onclick="addSku('Library Print Quota (50 pgs)', 50)">
+                    <span class="cat-pill">PRINT QUOTA</span>
+                    <div style="margin: 12px 0;">
+                        <strong style="font-size: 16px;">Library Print Quota (50 pgs)</strong>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">Instant student print credit top-up</p>
+                    </div>
+                    <strong style="color: var(--bookstore); font-size: 18px;">₱50.00</strong>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="font-size: 16px;">Retail Receipt</h3>
+                    <button onclick="clearCart()" style="background:none; border:none; color:var(--danger); font-size:12px; font-weight:700; cursor:pointer;">Clear All</button>
+                </div>
+                <div class="tray-list" id="cartList">
+                    <p style="color:var(--text-muted); font-size:13px; text-align:center; margin-top:50px;">Select items from catalog</p>
+                </div>
+                <div class="total-pill">
+                    <span style="font-size: 13px;">AMOUNT DUE</span>
+                    <span id="cartTotal">₱0.00</span>
+                </div>
+
+                <div class="tap-box">
+                    <label style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; color: var(--text-muted);">Student Smart Card Tap</label>
+                    <input type="text" class="mono" id="bookUid" value="CARD_88A12B">
+                    <button class="btn btn-bookstore" style="margin-top: 10px;" onclick="payBookstore()">Tap Card & Pay</button>
+                </div>
+                <div id="bookStatus" class="status-toast" style="background: var(--bg); color: var(--text-muted);">Awaiting student RFID tap</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="store.js"></script>
+<script>
+    let cart = [];
+    function addSku(name, price) { cart.push({ name, price }); renderCart(); }
+    function clearCart() { cart = []; renderCart(); }
+    function renderCart() {
+        const total = cart.reduce((sum, i) => sum + i.price, 0);
+        document.getElementById('cartTotal').innerText = formatPHP(total);
+        const list = document.getElementById('cartList');
+        if (!cart.length) {
+            list.innerHTML = `<p style="color:var(--text-muted); font-size:13px; text-align:center; margin-top:50px;">Select items from catalog</p>`;
+            return;
+        }
+        list.innerHTML = cart.map(i => `<div class="tray-row"><span>${i.name}</span><strong>${formatPHP(i.price)}</strong></div>`).join('');
+    }
+    function payBookstore() {
+        const total = cart.reduce((sum, i) => sum + i.price, 0);
+        const status = document.getElementById('bookStatus');
+        const db = getDB();
+
+        if (total === 0) {
+            status.style.background = 'var(--danger-soft)'; status.style.color = 'var(--danger)';
+            status.innerText = 'Select at least one catalog item first.';
+            return;
+        }
+        if (db.student.isLocked) {
+            status.style.background = 'var(--danger-soft)'; status.style.color = 'var(--danger)';
+            status.innerText = 'DECLINED: Card [CARD_88A12B] is FROZEN by owner!';
+            return;
+        }
+        if (db.student.balance < total) {
+            status.style.background = 'var(--danger-soft)'; status.style.color = 'var(--danger)';
+            status.innerText = `DECLINED: Insufficient balance (${formatPHP(db.student.balance)})`;
+            return;
+        }
+
+        db.student.balance -= total;
+        const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        db.transactions.unshift({
+            merchant: "University Book Store",
+            terminal: "POS-BKSTR-01",
+            amount: -total,
+            time: `Just now (${now})`,
+            type: "Debit"
+        });
+        saveDB(db);
+
+        status.style.background = 'var(--primary-soft)'; status.style.color = 'var(--primary)';
+        status.innerText = `APPROVED! Deducted ${formatPHP(total)} • New Bal: ${formatPHP(db.student.balance)}`;
+        clearCart();
+    }
+</script>
+</body>
+</html>

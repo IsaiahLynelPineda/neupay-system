@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NEUPay — MIS Admin Command Center</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 22px; }
+        .admin-split { display: grid; grid-template-columns: 360px 1fr; gap: 22px; }
+        .node-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+        .node-row:last-child { border-bottom: none; }
+        .filter-tabs { display: flex; gap: 6px; }
+        .filter-btn { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); font-size: 12px; font-weight: 700; cursor: pointer; }
+        .filter-btn.active-tab { background: var(--sidebar-bg); color: #fff; border-color: var(--sidebar-bg); }
+        .tx-table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 12px; }
+        .tx-table th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); padding: 10px 8px; border-bottom: 1px solid var(--border); }
+        .tx-table td { padding: 14px 8px; border-bottom: 1px solid var(--border); }
+        @media (max-width: 1100px) { .admin-kpi-grid { grid-template-columns: repeat(2, 1fr); } .admin-split { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div>
+            <a href="index.html" class="sidebar-brand">
+                <div class="brand-icon" style="background: linear-gradient(135deg, #6366f1, #4338ca);">N</div>
+                <div>
+                    <div style="font-weight: 800; font-size: 16px;">NEUPay MIS</div>
+                    <div style="font-size: 11px; color: #94a3b8;">System Oversight</div>
+                </div>
+            </a>
+
+            <div class="nav-section-label">Campus Portals</div>
+            <a href="index.html" class="side-link">Student Dashboard</a>
+            <a href="cashier.html" class="side-link">Cashier Window</a>
+            <a href="admin.html" class="side-link active" style="background: #4f46e5; box-shadow: 0 4px 12px rgba(79,70,229,0.3);">MIS Admin Center</a>
+
+            <div class="nav-section-label">Merchant Terminals</div>
+            <a href="pos-canteen.html" class="side-link">Canteen POS Terminal</a>
+            <a href="pos-bookstore.html" class="side-link">Bookstore POS Terminal</a>
+        </div>
+
+        <div class="terminal-status">
+            <div><span class="pulse-dot" style="background:#818cf8;"></span><strong>MIS-ROOT-CONSOLE</strong></div>
+            <div style="color: #94a3b8; font-size: 11px; margin-top: 4px;">All 4 Campus Nodes Synced</div>
+        </div>
+    </aside>
+
+    <main class="main-area">
+        <div class="page-header">
+            <div>
+                <h1>MIS Campus Oversight & Audit Center</h1>
+                <p>Global visibility across student wallets, cashier reloads, merchant revenue, and RFID hardware</p>
+            </div>
+            <button class="btn btn-outline" style="width: auto;" onclick="resetDB()">Reset System Demo</button>
+        </div>
+
+        <!-- 4-Column Executive KPI Row -->
+        <div class="admin-kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">System Wallet Float</div>
+                <div class="kpi-value" style="color: var(--primary);" id="sysFloat">₱1,450.00</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Active stored-value liability</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Canteen POS Revenue</div>
+                <div class="kpi-value" style="color: var(--canteen);" id="canteenRev">₱85.00</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">POS-CANTEEN-04</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Bookstore POS Revenue</div>
+                <div class="kpi-value" style="color: var(--bookstore);" id="bookRev">₱220.00</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">POS-BKSTR-01</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Total Ledger Events</div>
+                <div class="kpi-value" id="totalEvents">3</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">100% reconciled</div>
+            </div>
+        </div>
+
+        <div class="admin-split">
+            <!-- Left Column: User Card Registry + Live Terminal Telemetry -->
+            <div>
+                <div class="card" style="margin-bottom: 18px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="font-size: 15px;">RFID Cardholder Registry</h3>
+                        <span id="adminLockBadge" class="badge badge-success">● ACTIVE</span>
+                    </div>
+
+                    <div style="background: var(--bg); padding: 14px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 12px;">
+                        <div style="font-weight: 800; font-size: 15px;">John Doe</div>
+                        <div class="mono" style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">ID: 2026-10492 • CARD_88A12B</div>
+                        <div style="font-size: 13px; margin-top: 8px;">Balance: <strong style="color: var(--primary);" id="registryBal">₱1,450.00</strong></div>
+                    </div>
+
+                    <button class="btn btn-outline" onclick="adminToggleLock()">MIS Override: Lock / Unfreeze Card</button>
+                </div>
+
+                <div class="card">
+                    <h3 style="font-size: 15px; margin-bottom: 8px;">Connected Campus Terminals</h3>
+                    <div class="node-row">
+                        <div><strong>CSH-WINDOW-02</strong><div style="font-size:11.5px; color:var(--text-muted);">Treasury Reload Desk</div></div>
+                        <span class="badge badge-success">Online</span>
+                    </div>
+                    <div class="node-row">
+                        <div><strong>POS-CANTEEN-04</strong><div style="font-size:11.5px; color:var(--text-muted);">Main Cafeteria</div></div>
+                        <span class="badge badge-success">Online</span>
+                    </div>
+                    <div class="node-row">
+                        <div><strong>POS-BKSTR-01</strong><div style="font-size:11.5px; color:var(--text-muted);">University Book Store</div></div>
+                        <span class="badge badge-success">Online</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Master Global Audit Trail -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 8px;">
+                    <div>
+                        <h3 style="font-size: 16px;">Global System Audit Trail</h3>
+                        <p style="font-size: 12px; color: var(--text-muted);">Real-time feed of every reload, meal tap, and retail purchase</p>
+                    </div>
+                    <div class="filter-tabs">
+                        <button class="filter-btn active-tab" onclick="setFilter('ALL', this)">All Events</button>
+                        <button class="filter-btn" onclick="setFilter('Credit', this)">Cashier Reloads</button>
+                        <button class="filter-btn" onclick="setFilter('Debit', this)">POS Sales</button>
+                    </div>
+                </div>
+
+                <table class="tx-table">
+                    <thead>
+                        <tr>
+                            <th>Station / Merchant</th>
+                            <th>Terminal ID</th>
+                            <th>Type</th>
+                            <th>Timestamp</th>
+                            <th style="text-align: right;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminMasterTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="store.js"></script>
+<script>
+    let currentFilter = 'ALL';
+
+    function setFilter(type, btn) {
+        currentFilter = type;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active-tab'));
+        btn.classList.add('active-tab');
+        renderAdmin();
+    }
+
+    function renderAdmin() {
+        const db = getDB();
+        const bal = formatPHP(db.student.balance);
+        document.getElementById('sysFloat').innerText = bal;
+        document.getElementById('registryBal').innerText = bal;
+        document.getElementById('totalEvents').innerText = db.transactions.length;
+
+        const canteenSum = db.transactions
+            .filter(t => t.terminal === 'POS-CANTEEN-04')
+            .reduce((s, t) => s + Math.abs(t.amount), 0);
+        const bookSum = db.transactions
+            .filter(t => t.terminal === 'POS-BKSTR-01')
+            .reduce((s, t) => s + Math.abs(t.amount), 0);
+
+        document.getElementById('canteenRev').innerText = formatPHP(canteenSum);
+        document.getElementById('bookRev').innerText = formatPHP(bookSum);
+
+        const badge = document.getElementById('adminLockBadge');
+        if (db.student.isLocked) {
+            badge.className = 'badge badge-danger';
+            badge.innerText = '● FROZEN';
+        } else {
+            badge.className = 'badge badge-success';
+            badge.innerText = '● ACTIVE';
+        }
+
+        const filtered = currentFilter === 'ALL'
+            ? db.transactions
+            : db.transactions.filter(t => t.type === currentFilter);
+
+        document.getElementById('adminMasterTable').innerHTML = filtered.map(tx => `
+            <tr>
+                <td><strong>${tx.merchant}</strong></td>
+                <td class="mono" style="font-size: 12px; color: var(--text-muted);">${tx.terminal}</td>
+                <td><span class="badge ${tx.amount > 0 ? 'badge-success' : 'badge-neutral'}">${tx.type}</span></td>
+                <td style="color: var(--text-muted); font-size: 12.5px;">${tx.time}</td>
+                <td style="text-align: right; font-weight: 800; color: ${tx.amount > 0 ? 'var(--primary)' : 'var(--text)'};">
+                    ${tx.amount > 0 ? '+' : '-'}${formatPHP(tx.amount)}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function adminToggleLock() {
+        const db = getDB();
+        db.student.isLocked = !db.student.isLocked;
+        saveDB(db);
+        renderAdmin();
+    }
+
+    renderAdmin();
+    window.addEventListener('storage', renderAdmin);
+</script>
+</body>
+</html>
